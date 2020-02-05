@@ -13,11 +13,11 @@ using FxStreetDeveloper.API.Controllers;
 
 namespace FxStreetDeveloper.API.UnitTests
 {
-    public class PlayerControllerShould
+    public class RefereeControllerShould
     {
         private readonly FxStreetDeveloperContext _context;
 
-        public PlayerControllerShould()
+        public RefereeControllerShould()
         {
             var serviceProvider = new ServiceCollection()
                 .AddEntityFrameworkInMemoryDatabase()
@@ -34,76 +34,72 @@ namespace FxStreetDeveloper.API.UnitTests
         }
 
         [Fact]
-        public void Get_All_Players()
+        public void Get_All_Referees()
         {
             //Arrange
-            PlayerController controller = new PlayerController(_context);
+            RefereeController controller = new RefereeController(_context);
 
             //Act
             var result = controller.Get();
 
             //Assert
-            var typedResult = (IEnumerable<V1.PlayerResponse>)Assert.IsType<OkObjectResult>(result).Value;
+            var typedResult = (IEnumerable<V1.RefereeResponse>)Assert.IsType<OkObjectResult>(result).Value;
             typedResult.Should().HaveCount(2);
-            typedResult.Should().Contain(s => s.Name == "Johan Cruyff").And.Contain(s => s.Name == "Diego Armando Maradona");
+            typedResult.Should().Contain(s => s.Name == "Eduardo Iturralde").And.Contain(s => s.Name == "Graham Poll");
         }
 
 
         [Fact]
-        public void Get_One_Player()
+        public void Get_One_Referee()
         {
             //Arrange
-            PlayerController controller = new PlayerController(_context);
+            RefereeController controller = new RefereeController(_context);
             IActionResult result = controller.Get();
-            IEnumerable<V1.PlayerResponse> typedResult = (IEnumerable<V1.PlayerResponse>)Assert.IsType<OkObjectResult>(result).Value;
+            IEnumerable<V1.RefereeResponse> typedResult = (IEnumerable<V1.RefereeResponse>)Assert.IsType<OkObjectResult>(result).Value;
             int id = typedResult.ToList().First().Id;
 
             //Act
             var resultGet = controller.Get(id);
 
             //Assert
-            var typedResultGet = (V1.PlayerResponse)Assert.IsType<OkObjectResult>(resultGet).Value;
-            typedResultGet.Should().Match<V1.PlayerResponse>(m => m.Name == "Diego Armando Maradona");
+            var typedResultGet = (V1.RefereeResponse)Assert.IsType<OkObjectResult>(resultGet).Value;
+            typedResultGet.Should().Match<V1.RefereeResponse>(m => m.Name == "Eduardo Iturralde");
         }
 
         [Fact]
-        public void Create_New_Player()
+        public void Create_New_Referee()
         {
             //Arrange
-            PlayerController controller = new PlayerController(_context);
-            V1.PlayerRequest player = new V1.PlayerRequest()
+            RefereeController controller = new RefereeController(_context);
+            V1.RefereeRequest referee = new V1.RefereeRequest()
             {
-                Name = "Roberto Baggio",
-                Number = 10,
-                TeamName = "Italy",
-                YellowCards = 3,
-                RedCards = 1,
+                Name = "Pierluigi Collina",
                 MinutesPlayed = 270,
 
             };
 
             //Act
-            var resultCreate = controller.Create(player);
+            var resultCreate = controller.Create(referee);
             var result = controller.Get();
 
             //Assert
             Assert.IsType<NoContentResult>(resultCreate);
-            var typedResult = (IEnumerable<V1.PlayerResponse>)Assert.IsType<OkObjectResult>(result).Value;
+            var typedResult = (IEnumerable<V1.RefereeResponse>)Assert.IsType<OkObjectResult>(result).Value;
             typedResult.Should().HaveCount(3);
-            typedResult.Should().Contain(s => s.Name == "Johan Cruyff")
-                .And.Contain(s => s.Name == "Diego Armando Maradona")
-                .And.Contain(s => s.Name == "Roberto Baggio");
+            typedResult.Should().Contain(s => s.Name == "Pierluigi Collina")
+                .And.Contain(s => s.Name == "Eduardo Iturralde")
+                .And.Contain(s => s.Name == "Graham Poll");
         }
 
         private void Seed(FxStreetDeveloperContext context)
         {
-            Player[] players = new[]
+            Referee[] referees = new[]
             {
-                new Player("Diego Armando Maradona", 10, "Argentina", 3, 0, 90),
-                new Player("Johan Cruyff", 14, "Holland", 1, 0, 180),
+                new Referee("Eduardo Iturralde", 90),
+                new Referee("Graham Poll", 180),
             };
 
-            context.Players.AddRange(players);
+            context.Referees.AddRange(referees);
             context.SaveChanges();
         }
     }

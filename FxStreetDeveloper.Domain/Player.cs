@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace FxStreetDeveloper.Domain
 {
@@ -11,6 +12,9 @@ namespace FxStreetDeveloper.Domain
 		public int YellowCards { get; private set; }
 		public int RedCards { get; private set; }
 		public int MinutesPlayed { get; private set; }
+
+		public ICollection<MatchsPlayersHouse> MatchsPlayersHouse { get; private set; }
+		public ICollection<MatchsPlayersAway> MatchsPlayersAway { get; private set; }
 
 		public Player(string name, int number, string teamName, int yellowCards, int redCards, int minutesPlayed)
 		{

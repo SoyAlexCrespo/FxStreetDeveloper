@@ -13,11 +13,11 @@ using FxStreetDeveloper.API.Controllers;
 
 namespace FxStreetDeveloper.API.UnitTests
 {
-    public class PlayerControllerShould
+    public class ManagerControllerShould
     {
         private readonly FxStreetDeveloperContext _context;
 
-        public PlayerControllerShould()
+        public ManagerControllerShould()
         {
             var serviceProvider = new ServiceCollection()
                 .AddEntityFrameworkInMemoryDatabase()
@@ -34,76 +34,74 @@ namespace FxStreetDeveloper.API.UnitTests
         }
 
         [Fact]
-        public void Get_All_Players()
+        public void Get_All_Managers()
         {
             //Arrange
-            PlayerController controller = new PlayerController(_context);
+            ManagerController controller = new ManagerController(_context);
 
             //Act
             var result = controller.Get();
 
             //Assert
-            var typedResult = (IEnumerable<V1.PlayerResponse>)Assert.IsType<OkObjectResult>(result).Value;
+            var typedResult = (IEnumerable<V1.ManagerResponse>)Assert.IsType<OkObjectResult>(result).Value;
             typedResult.Should().HaveCount(2);
-            typedResult.Should().Contain(s => s.Name == "Johan Cruyff").And.Contain(s => s.Name == "Diego Armando Maradona");
+            typedResult.Should().Contain(s => s.Name == "Fabio Capello").And.Contain(s => s.Name == "Luis Aragonés");
         }
 
 
         [Fact]
-        public void Get_One_Player()
+        public void Get_One_Manager()
         {
             //Arrange
-            PlayerController controller = new PlayerController(_context);
+            ManagerController controller = new ManagerController(_context);
             IActionResult result = controller.Get();
-            IEnumerable<V1.PlayerResponse> typedResult = (IEnumerable<V1.PlayerResponse>)Assert.IsType<OkObjectResult>(result).Value;
+            IEnumerable<V1.ManagerResponse> typedResult = (IEnumerable<V1.ManagerResponse>)Assert.IsType<OkObjectResult>(result).Value;
             int id = typedResult.ToList().First().Id;
 
             //Act
             var resultGet = controller.Get(id);
 
             //Assert
-            var typedResultGet = (V1.PlayerResponse)Assert.IsType<OkObjectResult>(resultGet).Value;
-            typedResultGet.Should().Match<V1.PlayerResponse>(m => m.Name == "Diego Armando Maradona");
+            var typedResultGet = (V1.ManagerResponse)Assert.IsType<OkObjectResult>(resultGet).Value;
+            typedResultGet.Should().Match<V1.ManagerResponse>(m => m.Name == "Fabio Capello");
         }
 
         [Fact]
-        public void Create_New_Player()
+        public void Create_New_Manager()
         {
             //Arrange
-            PlayerController controller = new PlayerController(_context);
-            V1.PlayerRequest player = new V1.PlayerRequest()
+            ManagerController controller = new ManagerController(_context);
+            V1.ManagerRequest manager = new V1.ManagerRequest()
             {
-                Name = "Roberto Baggio",
-                Number = 10,
-                TeamName = "Italy",
+                Name = "Bobby Robson",
+                TeamName = "England",
                 YellowCards = 3,
                 RedCards = 1,
-                MinutesPlayed = 270,
 
             };
 
             //Act
-            var resultCreate = controller.Create(player);
+            var resultCreate = controller.Create(manager);
             var result = controller.Get();
 
             //Assert
             Assert.IsType<NoContentResult>(resultCreate);
-            var typedResult = (IEnumerable<V1.PlayerResponse>)Assert.IsType<OkObjectResult>(result).Value;
+            var typedResult = (IEnumerable<V1.ManagerResponse>)Assert.IsType<OkObjectResult>(result).Value;
             typedResult.Should().HaveCount(3);
-            typedResult.Should().Contain(s => s.Name == "Johan Cruyff")
-                .And.Contain(s => s.Name == "Diego Armando Maradona")
-                .And.Contain(s => s.Name == "Roberto Baggio");
+            typedResult.Should().Contain(s => s.Name == "Bobby Robson")
+                .And.Contain(s => s.Name == "Fabio Capello")
+                .And.Contain(s => s.Name == "Luis Aragonés");
         }
 
         private void Seed(FxStreetDeveloperContext context)
         {
-            Player[] players = new[]
+            Manager[] managers = new[]
             {
-                new Player("Diego Armando Maradona", 10, "Argentina", 3, 0, 90),
-                new Player("Johan Cruyff", 14, "Holland", 1, 0, 180),
+                new Manager("Fabio Capello", "Italy", 3, 0),
+                new Manager("Luis Aragonés", "Spain", 1, 0),
             };
 
-            context.Players.AddRange(players);
+            context.Managers.AddRange(managers);
             context.SaveChanges();
         }
     }
